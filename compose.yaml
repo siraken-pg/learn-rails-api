@@ -1,0 +1,48 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/rails-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db-development
+      - db-test
+  solargraph:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bundle exec solargraph socket --host=0.0.0.0 --port=7658
+    volumes:
+      - .:/rails-app
+      - bundle:/usr/local/bundle
+    ports:
+      - "7658:7658"
+    # logging:
+    #   driver: none
+  db-development:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_development:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: db_development
+  db-test:
+    image: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_test:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: db_test
+volumes:
+  bundle:
+  db_development:
+  db_test:
